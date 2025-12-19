@@ -12,7 +12,7 @@ const defaultListings = [
     price: 850,
     description: "Helle, möblierte Wohnung, Nähe S-Bahn.",
     createdAt: "2025-01-10",
-    image: "img/wohnung.jpg"
+    image: "assets/img/wohnung.jpg"
   },
   {
     id: 2,
@@ -22,7 +22,7 @@ const defaultListings = [
     price: 620,
     description: "Ideal für Singles, warm, moderne Küche.",
     createdAt: "2025-01-12",
-    image: "img/wohnung.jpg"
+    image: "assets/img/wohnung.jpg"
   },
   {
     id: 3,
@@ -32,7 +32,7 @@ const defaultListings = [
     salary: 14,
     description: "Kassierer/in oder Warenverräumer/in, flexible Zeiten.",
     createdAt: "2025-01-15",
-    image: "img/job.jpg"
+    image: "assets/img/job.jpg"
   },
   {
     id: 4,
@@ -42,7 +42,7 @@ const defaultListings = [
     age: 35,
     description: "Neu in Deutschland, möchte neue Leute kennenlernen.",
     createdAt: "2025-01-16",
-    image: "img/dating.jpg"
+    image: "assets/img/dating.jpg"
   }
 ];
 
@@ -163,10 +163,10 @@ function initPostForm() {
       age: 0,
       image:
         type === "wohnung"
-          ? "img/wohnung.jpg"
+          ? "assets/img/wohnung.jpg"
           : type === "job"
-          ? "img/job.jpg"
-          : "img/dating.jpg",
+          ? "assets/img/job.jpg"
+          : "assets/img/dating.jpg",
       createdAt: new Date().toISOString().slice(0, 10)
     };
 
@@ -194,3 +194,4 @@ document.addEventListener("DOMContentLoaded", () => {
     initPostForm();
   }
 });
+
