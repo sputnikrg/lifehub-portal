@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Anzeige aufgeben • LifeHub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="assets/css/style.css">
+    <script src="assets/js/script.js" defer></script>
+</head>
+
+<body data-page="post">
+
+    <header>
+        <div class="logo">
+            <a href="index.html">
+                <img src="assets/img/logo.png" alt="LifeHub Logo">
+            </a>
+        </div>
+        <nav>
+            <span class="lang">Deutsch | English | Русский</span>
+        </nav>
+    </header>
+
+    <main class="page-main">
+        <section class="page-hero">
+            <div class="container">
+                <h1>Anzeige aufgeben</h1>
+                <p>Fülle das Formular aus und veröffentliche dein Angebot.</p>
+            </div>
+        </section>
+
+        <section class="page-listings">
+            <div class="container">
+
+                <form id="adForm" class="form-box">
+
+                    <label>Typ auswählen</label>
+                    <select id="type">
+                        <option value="wohnung">Wohnung</option>
+                        <option value="job">Job</option>
+                        <option value="dating">Dating</option>
+                    </select>
+
+                    <label>Titel</label>
+                    <input id="title" required>
+
+                    <label>Stadt</label>
+                    <input id="city" required>
+
+                    <label>Beschreibung</label>
+                    <textarea id="desc" required></textarea>
+
+                    <button type="submit" class="google">Speichern</button>
+                </form>
+
+            </div>
+        </section>
+    </main>
+
+</body>
+
+</html>

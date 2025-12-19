@@ -190,3 +190,22 @@ button:hover { opacity: 0.9; }
 .listing-content {
   padding: 14px 18px 18px;
 }
+
+.form-box {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #fff;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+}
+
+.form-box input,
+.form-box textarea,
+.form-box select {
+  padding: 10px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}

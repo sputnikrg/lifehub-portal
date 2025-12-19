@@ -117,3 +117,35 @@ document.addEventListener("DOMContentLoaded", () => {
   if (page === "job") renderListings("job");
   if (page === "dating") renderListings("dating");
 });
+// ---------------- FORM HANDLING ----------------
+
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("adForm");
+  if (!form) return;
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const type = document.getElementById("type").value;
+    const title = document.getElementById("title").value;
+    const city = document.getElementById("city").value;
+    const description = document.getElementById("desc").value;
+
+    const newAd = {
+      id: Date.now(),
+      type,
+      title,
+      city,
+      description,
+      price: 0,
+      salary: 0,
+      age: 0,
+      image: "assets/img/placeholder.jpg"
+    };
+
+    listings.push(newAd);
+
+    alert("Anzeige gespeichert!");
+    window.location.href = `${type}.html`;
+  });
+});
