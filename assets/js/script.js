@@ -1,17 +1,18 @@
-// assets/js/script.js
+// script.js - логика портала LifeHub
 
-// Временные тестовые объявления
-// (потом заменим на реальные данные из базы)
-const listings = [
+const STORAGE_KEY = 'lifehub_user_ads_v1';
+
+// Базовые (демо) объявления, которые "зашиты" в сайт
+const defaultListings = [
   {
     id: 1,
-    type: "wohnung",          // wohnung | job | dating
+    type: "wohnung",
     title: "2-Zimmer Wohnung in Waiblingen",
     city: "Waiblingen",
     price: 850,
     description: "Helle, möblierte Wohnung, Nähe S-Bahn.",
     createdAt: "2025-01-10",
-    image: "assets/img/wohnung.jpg"    // временно одна и та же картинка
+    image: "img/wohnung.jpg"
   },
   {
     id: 2,
@@ -21,7 +22,7 @@ const listings = [
     price: 620,
     description: "Ideal für Singles, warm, moderne Küche.",
     createdAt: "2025-01-12",
-    image: "assets/img/wohnung.jpg"
+    image: "img/wohnung.jpg"
   },
   {
     id: 3,
@@ -31,7 +32,7 @@ const listings = [
     salary: 14,
     description: "Kassierer/in oder Warenverräumer/in, flexible Zeiten.",
     createdAt: "2025-01-15",
-    image: "assets/img/job.jpg"
+    image: "img/job.jpg"
   },
   {
     id: 4,
@@ -41,16 +42,42 @@ const listings = [
     age: 35,
     description: "Neu in Deutschland, möchte neue Leute kennenlernen.",
     createdAt: "2025-01-16",
-    image: "assets/img/dating.jpg"
+    image: "img/dating.jpg"
   }
 ];
 
-// Получить объявления по типу
-function getListingsByType(type) {
-  return listings.filter(item => item.type === type);
+// Объявления, которые добавляет пользователь (будут храниться в localStorage)
+let userListings = [];
+
+function loadUserListings() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const data = JSON.parse(raw);
+    if (Array.isArray(data)) {
+      userListings = data;
+    }
+  } catch (err) {
+    console.error("Fehler beim Lesen von localStorage", err);
+  }
 }
 
-// Отрисовать карточки на странице
+function saveUserListings() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(userListings));
+  } catch (err) {
+    console.error("Fehler beim Speichern in localStorage", err);
+  }
+}
+
+function getAllListings() {
+  return [...defaultListings, ...userListings];
+}
+
+function getListingsByType(type) {
+  return getAllListings().filter(item => item.type === type);
+}
+
 function renderListings(type) {
   const container = document.getElementById("listing-container");
   if (!container) return;
@@ -70,7 +97,7 @@ function renderListings(type) {
             <img src="${item.image}" class="listing-img" alt="${item.title}">
             <div class="listing-content">
               <h3>${item.title}</h3>
-              <p class="listing-meta">${item.city} • ${item.price} € / Monat</p>
+              <p class="listing-meta">${item.city} • ${item.price || "-"} € / Monat</p>
               <p class="listing-desc">${item.description}</p>
             </div>
           </article>
@@ -83,7 +110,7 @@ function renderListings(type) {
             <img src="${item.image}" class="listing-img" alt="${item.title}">
             <div class="listing-content">
               <h3>${item.title}</h3>
-              <p class="listing-meta">${item.city} • ab ${item.salary} € / Stunde</p>
+              <p class="listing-meta">${item.city} • ab ${item.salary || "-"} € / Stunde</p>
               <p class="listing-desc">${item.description}</p>
             </div>
           </article>
@@ -96,7 +123,7 @@ function renderListings(type) {
             <img src="${item.image}" class="listing-img" alt="${item.title}">
             <div class="listing-content">
               <h3>${item.title}</h3>
-              <p class="listing-meta">${item.city} • ${item.age} Jahre</p>
+              <p class="listing-meta">${item.city} • ${item.age || ""} Jahre</p>
               <p class="listing-desc">${item.description}</p>
             </div>
           </article>
@@ -108,18 +135,7 @@ function renderListings(type) {
     .join("");
 }
 
-// Инициализация в зависимости от страницы
-document.addEventListener("DOMContentLoaded", () => {
-  const page = document.body.dataset.page;
-  if (!page) return;
-
-  if (page === "wohnung") renderListings("wohnung");
-  if (page === "job") renderListings("job");
-  if (page === "dating") renderListings("dating");
-});
-// ---------------- FORM HANDLING ----------------
-
-document.addEventListener("DOMContentLoaded", () => {
+function initPostForm() {
   const form = document.getElementById("adForm");
   if (!form) return;
 
@@ -127,9 +143,14 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
 
     const type = document.getElementById("type").value;
-    const title = document.getElementById("title").value;
-    const city = document.getElementById("city").value;
-    const description = document.getElementById("desc").value;
+    const title = document.getElementById("title").value.trim();
+    const city = document.getElementById("city").value.trim();
+    const description = document.getElementById("desc").value.trim();
+
+    if (!title || !city || !description) {
+      alert("Bitte alle Felder ausfüllen.");
+      return;
+    }
 
     const newAd = {
       id: Date.now(),
@@ -140,12 +161,36 @@ document.addEventListener("DOMContentLoaded", () => {
       price: 0,
       salary: 0,
       age: 0,
-      image: "assets/img/placeholder.jpg"
+      image:
+        type === "wohnung"
+          ? "img/wohnung.jpg"
+          : type === "job"
+          ? "img/job.jpg"
+          : "img/dating.jpg",
+      createdAt: new Date().toISOString().slice(0, 10)
     };
 
-    listings.push(newAd);
+    userListings.push(newAd);
+    saveUserListings();
 
     alert("Anzeige gespeichert!");
-    window.location.href = `${type}.html`;
+    window.location.href = type + ".html";
   });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  loadUserListings();
+
+  const page = document.body.dataset.page;
+  if (!page) return;
+
+  if (page === "wohnung") {
+    renderListings("wohnung");
+  } else if (page === "job") {
+    renderListings("job");
+  } else if (page === "dating") {
+    renderListings("dating");
+  } else if (page === "post") {
+    initPostForm();
+  }
 });
