@@ -97,11 +97,19 @@ button:hover { opacity: 0.9; }
 }
 .overlay h2 { margin: 0 0 12px; font-size: 1.8rem; }
 .overlay p { margin: 0 0 20px; }
-.overlay button {
+.overlay .card-button {
+  display: inline-block;
   background: #fff;
   color: #1976d2;
   font-weight: bold;
   padding: 10px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.overlay .card-button:hover {
+  opacity: 0.9;
 }
 
 /* Responsive */
