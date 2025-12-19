@@ -1,15 +1,13 @@
 <!DOCTYPE html>
 <html lang="de">
-
 <head>
   <meta charset="UTF-8" />
   <title>LifeHub • Wohnungen</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
   <link rel="stylesheet" href="assets/css/style.css">
   <script src="assets/js/script.js" defer></script>
 </head>
-
-<!-- ВАЖНО! data-page="wohnung" -->
 
 <body data-page="wohnung">
 
@@ -22,10 +20,12 @@
     <nav>
       <span class="lang">Deutsch | English | Русский</span>
       <button class="google">Mit Google anmelden</button>
-      <button class="ad" onclick="window.location.href='post-ad.html'">Anzeige aufgeben</button>
+      <button class="ad" onclick="window.location.href='post-ad.html'">
+        Anzeige aufgeben
+      </button>
     </nav>
   </header>
-
+  
   <main class="page-main">
     <section class="page-hero">
       <div class="container">
@@ -38,6 +38,31 @@
       <div class="container">
         <h2>Aktuelle Angebote</h2>
 
+        <!-- Блок фильтров -->
+        <form id="wohnungFilter" class="filter-box">
+          <div class="filter-field">
+            <label for="filterCity">Stadt</label>
+            <input
+              id="filterCity"
+              type="text"
+              placeholder="z.B. Stuttgart, Weinstadt"
+            >
+          </div>
+
+          <div class="filter-field">
+            <label for="filterMaxPrice">Max. Miete (€)</label>
+            <input
+              id="filterMaxPrice"
+              type="number"
+              min="0"
+              placeholder="z.B. 900"
+            >
+          </div>
+
+          <button type="submit" class="google">Filtern</button>
+          <button type="button" class="ad" id="filterReset">Zurücksetzen</button>
+        </form>
+
         <!-- Сюда JS вставит карточки -->
         <div id="listing-container" class="listing-grid"></div>
       </div>
@@ -45,5 +70,4 @@
   </main>
 
 </body>
-
 </html>

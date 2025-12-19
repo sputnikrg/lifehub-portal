@@ -62,22 +62,6 @@ function loadUserListings() {
   }
 }
 
-// Исправляем старые пути картинок из старых версий
-function fixOldImages() {
-  userListings = userListings.map(item => {
-    if (item.image && item.image.startsWith("img/")) {
-      return {
-        ...item,
-        image: item.image.replace("img/", "assets/img/")
-      };
-    }
-    return item;
-  });
-
-  saveUserListings();
-}
-
-
 function saveUserListings() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(userListings));
@@ -104,12 +88,35 @@ function getListingsByType(type) {
   return getAllListings().filter((item) => item.type === type);
 }
 
-// Отрисовка карточек
-function renderListings(type) {
+/**
+ * Отрисовка карточек
+ * options: { city?: string, maxPrice?: number }
+ */
+function renderListings(type, options = {}) {
   const container = document.getElementById("listing-container");
   if (!container) return;
 
-  const items = getListingsByType(type);
+  const { city, maxPrice } = options;
+
+  let items = getListingsByType(type);
+
+  // Фильтр по городу (подстрока, регистронезависимо)
+  if (city) {
+    const cityLower = city.toLowerCase();
+    items = items.filter((item) =>
+      item.city && item.city.toLowerCase().includes(cityLower)
+    );
+  }
+
+  // Фильтр по максимальной цене (только для квартир)
+  if (maxPrice && type === "wohnung") {
+    items = items.filter(
+      (item) =>
+        typeof item.price === "number" &&
+        !Number.isNaN(item.price) &&
+        item.price <= maxPrice
+    );
+  }
 
   if (items.length === 0) {
     container.innerHTML = "<p>Keine Einträge gefunden.</p>";
@@ -182,16 +189,52 @@ function initPostForm() {
   });
 }
 
+// Инициализация фильтра на странице квартир
+function initWohnungFilters() {
+  const form = document.getElementById("wohnungFilter");
+  if (!form) return;
+
+  const cityInput = document.getElementById("filterCity");
+  const priceInput = document.getElementById("filterMaxPrice");
+  const resetBtn = document.getElementById("filterReset");
+
+  function applyFilters() {
+    const cityValue = cityInput.value.trim();
+    const maxPriceValue = Number(priceInput.value);
+
+    const options = {};
+    if (cityValue) options.city = cityValue;
+    if (!Number.isNaN(maxPriceValue) && maxPriceValue > 0) {
+      options.maxPrice = maxPriceValue;
+    }
+
+    renderListings("wohnung", options);
+  }
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    applyFilters();
+  });
+
+  if (resetBtn) {
+    resetBtn.addEventListener("click", () => {
+      cityInput.value = "";
+      priceInput.value = "";
+      renderListings("wohnung"); // без фильтров
+    });
+  }
+}
+
 // Главная инициализация
 document.addEventListener("DOMContentLoaded", () => {
   loadUserListings();
-  fixOldImages();
 
   const page = document.body.dataset.page;
   if (!page) return;
 
   if (page === "wohnung") {
     renderListings("wohnung");
+    initWohnungFilters();
   } else if (page === "job") {
     renderListings("job");
   } else if (page === "dating") {

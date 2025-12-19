@@ -240,3 +240,31 @@ button:hover { opacity: 0.9; }
   border-radius: 8px;
   border: 1px solid #ccc;
 }
+
+.filter-box {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 8px 0 16px;
+  align-items: flex-end;
+}
+
+.filter-field {
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+}
+
+.filter-field label {
+  font-size: 0.85rem;
+  color: #555;
+  margin-bottom: 4px;
+}
+
+.filter-field input {
+  padding: 8px 10px;
+  font-size: 0.9rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
