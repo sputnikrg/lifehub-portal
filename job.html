@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <title>LifeHub • Job</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Стили -->
+  <link rel="stylesheet" href="assets/css/style.css">
+
+  <!-- Наш JS -->
+  <script src="assets/js/script.js" defer></script>
+</head>
+
+<!-- ВАЖНО! data-page="wohnung" -->
+<body data-page="job>
+
+  <header>
+    <div class="logo">
+      <img src="assets/img/logo.png" alt="LifeHab Logo"> <!-- твой лого с домиком/сердцем -->
+    </div>
+    <nav>
+      <span class="lang">Deutsch | English | Русский</span>
+      <button class="google">Mit Google anmelden</button>
+      <button class="ad">Anzeige aufgeben</button>
+    </nav>
+  </header>
+  
+   <main class="page-main">
+    <section class="page-hero">
+      <div class="container">
+        <h1>Jobs finden</h1>
+        <p>Entdecke passende Stellenangebote für dich.</p>
+      </div>
+    </section>
+
+    <section class="page-listings">
+      <div class="container">
+        <h2>Aktuelle Jobs</h2>
+        <div id="listing-container" class="listing-grid"></div>
+      </div>
+    </section>
+  </main>
+</body>

@@ -116,3 +116,53 @@ button:hover { opacity: 0.9; }
   .cards { flex-direction: column; align-items: center; }
   .card { width: 100%; max-width: 400px; }
 }
+.page-main {
+  padding-top: 40px;
+}
+
+.page-hero {
+  padding: 40px 0 16px;
+}
+
+.page-hero h1 {
+  font-size: 2rem;
+  margin-bottom: 8px;
+}
+
+.page-hero p {
+  color: #555;
+}
+
+.page-listings {
+  padding: 16px 0 40px;
+}
+
+.listing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.listing-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 16px 20px;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.06);
+}
+
+.listing-card h3 {
+  margin: 0 0 8px;
+  font-size: 1.1rem;
+}
+
+.listing-meta {
+  margin: 0 0 8px;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.listing-desc {
+  margin: 0;
+  font-size: 0.95rem;
+}
