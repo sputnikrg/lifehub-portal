@@ -62,6 +62,22 @@ function loadUserListings() {
   }
 }
 
+// Исправляем старые пути картинок из старых версий
+function fixOldImages() {
+  userListings = userListings.map(item => {
+    if (item.image && item.image.startsWith("img/")) {
+      return {
+        ...item,
+        image: item.image.replace("img/", "assets/img/")
+      };
+    }
+    return item;
+  });
+
+  saveUserListings();
+}
+
+
 function saveUserListings() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(userListings));
@@ -169,6 +185,7 @@ function initPostForm() {
 // Главная инициализация
 document.addEventListener("DOMContentLoaded", () => {
   loadUserListings();
+  fixOldImages();
 
   const page = document.body.dataset.page;
   if (!page) return;
