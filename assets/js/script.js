@@ -1,8 +1,8 @@
-// script.js - логика портала LifeHub
+// assets/js/script.js
 
-const STORAGE_KEY = 'lifehub_user_ads_v1';
+const STORAGE_KEY = "lifehub_user_ads_v1";
 
-// Базовые (демо) объявления, которые "зашиты" в сайт
+// Базовые объявления (зашиты в код)
 const defaultListings = [
   {
     id: 1,
@@ -11,8 +11,8 @@ const defaultListings = [
     city: "Waiblingen",
     price: 850,
     description: "Helle, möblierte Wohnung, Nähe S-Bahn.",
-    createdAt: "2025-01-10",
-    image: "assets/img/wohnung.jpg"
+    image: "assets/img/wohnung.jpg",
+    createdAt: "2025-01-10"
   },
   {
     id: 2,
@@ -21,8 +21,8 @@ const defaultListings = [
     city: "Weinstadt",
     price: 620,
     description: "Ideal für Singles, warm, moderne Küche.",
-    createdAt: "2025-01-12",
-    image: "assets/img/wohnung.jpg"
+    image: "assets/img/wohnung.jpg",
+    createdAt: "2025-01-12"
   },
   {
     id: 3,
@@ -31,8 +31,8 @@ const defaultListings = [
     city: "Weinstadt",
     salary: 14,
     description: "Kassierer/in oder Warenverräumer/in, flexible Zeiten.",
-    createdAt: "2025-01-15",
-    image: "assets/img/job.jpg"
+    image: "assets/img/job.jpg",
+    createdAt: "2025-01-15"
   },
   {
     id: 4,
@@ -41,12 +41,12 @@ const defaultListings = [
     city: "Stuttgart",
     age: 35,
     description: "Neu in Deutschland, möchte neue Leute kennenlernen.",
-    createdAt: "2025-01-16",
-    image: "assets/img/dating.jpg"
+    image: "assets/img/dating.jpg",
+    createdAt: "2025-01-16"
   }
 ];
 
-// Объявления, которые добавляет пользователь (будут храниться в localStorage)
+// Объявления, которые добавляет пользователь (храним в localStorage)
 let userListings = [];
 
 function loadUserListings() {
@@ -57,27 +57,38 @@ function loadUserListings() {
     if (Array.isArray(data)) {
       userListings = data;
     }
-  } catch (err) {
-    console.error("Fehler beim Lesen von localStorage", err);
+  } catch (e) {
+    console.error("Fehler beim Lesen von localStorage", e);
   }
 }
 
 function saveUserListings() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(userListings));
-  } catch (err) {
-    console.error("Fehler beim Speichern in localStorage", err);
+  } catch (e) {
+    console.error("Fehler beim Speichern in localStorage", e);
   }
 }
 
+// Дефолтная картинка по типу
+function getDefaultImage(type) {
+  if (type === "wohnung") return "assets/img/wohnung.jpg";
+  if (type === "job") return "assets/img/job.jpg";
+  if (type === "dating") return "assets/img/dating.jpg";
+  return "assets/img/placeholder.jpg";
+}
+
+// Все объявления (дефолтные + пользовательские)
 function getAllListings() {
   return [...defaultListings, ...userListings];
 }
 
+// Фильтрация по типу
 function getListingsByType(type) {
-  return getAllListings().filter(item => item.type === type);
+  return getAllListings().filter((item) => item.type === type);
 }
 
+// Отрисовка карточек
 function renderListings(type) {
   const container = document.getElementById("listing-container");
   if (!container) return;
@@ -90,51 +101,33 @@ function renderListings(type) {
   }
 
   container.innerHTML = items
-    .map(item => {
+    .map((item) => {
+      const imgSrc = item.image || getDefaultImage(type);
+
+      let metaLine = "";
       if (type === "wohnung") {
-        return `
-          <article class="listing-card">
-            <img src="${item.image}" class="listing-img" alt="${item.title}">
-            <div class="listing-content">
-              <h3>${item.title}</h3>
-              <p class="listing-meta">${item.city} • ${item.price || "-"} € / Monat</p>
-              <p class="listing-desc">${item.description}</p>
-            </div>
-          </article>
-        `;
+        metaLine = `${item.city} • ${item.price || "-"} € / Monat`;
+      } else if (type === "job") {
+        metaLine = `${item.city} • ab ${item.salary || "-"} € / Stunde`;
+      } else if (type === "dating") {
+        metaLine = `${item.city} • ${item.age || ""} Jahre`;
       }
 
-      if (type === "job") {
-        return `
-          <article class="listing-card">
-            <img src="${item.image}" class="listing-img" alt="${item.title}">
-            <div class="listing-content">
-              <h3>${item.title}</h3>
-              <p class="listing-meta">${item.city} • ab ${item.salary || "-"} € / Stunde</p>
-              <p class="listing-desc">${item.description}</p>
-            </div>
-          </article>
-        `;
-      }
-
-      if (type === "dating") {
-        return `
-          <article class="listing-card">
-            <img src="${item.image}" class="listing-img" alt="${item.title}">
-            <div class="listing-content">
-              <h3>${item.title}</h3>
-              <p class="listing-meta">${item.city} • ${item.age || ""} Jahre</p>
-              <p class="listing-desc">${item.description}</p>
-            </div>
-          </article>
-        `;
-      }
-
-      return "";
+      return `
+        <article class="listing-card">
+          <img src="${imgSrc}" alt="${item.title}" class="listing-img">
+          <div class="listing-content">
+            <h3>${item.title}</h3>
+            <p class="listing-meta">${metaLine}</p>
+            <p class="listing-desc">${item.description}</p>
+          </div>
+        </article>
+      `;
     })
     .join("");
 }
 
+// Инициализация формы добавления объявления
 function initPostForm() {
   const form = document.getElementById("adForm");
   if (!form) return;
@@ -161,12 +154,7 @@ function initPostForm() {
       price: 0,
       salary: 0,
       age: 0,
-      image:
-        type === "wohnung"
-          ? "assets/img/wohnung.jpg"
-          : type === "job"
-          ? "assets/img/job.jpg"
-          : "assets/img/dating.jpg",
+      image: getDefaultImage(type),
       createdAt: new Date().toISOString().slice(0, 10)
     };
 
@@ -178,6 +166,7 @@ function initPostForm() {
   });
 }
 
+// Главная инициализация
 document.addEventListener("DOMContentLoaded", () => {
   loadUserListings();
 
@@ -194,4 +183,3 @@ document.addEventListener("DOMContentLoaded", () => {
     initPostForm();
   }
 });
-
