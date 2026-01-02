@@ -1,3 +1,5 @@
+console.log("SCRIPT LOADED");
+
 // assets/js/script.js
 
 const STORAGE_KEY = "lifehub_user_ads_v1";
@@ -240,6 +242,56 @@ function renderListingDetail() {
   `;
 }
 
+function renderFavorites() {
+  const container = document.getElementById("listing-container");
+  if (!container) return;
+
+  const favIds = getFavorites();
+
+  if (!favIds.length) {
+    container.innerHTML = "<p>Keine Favoriten gespeichert.</p>";
+    return;
+  }
+
+  const items = getAllListings().filter(item =>
+    favIds.includes(item.id)
+  );
+
+  container.innerHTML = items.map(item => {
+    let meta = "";
+    if (item.type === "wohnung") {
+      meta = `${item.city} • ${item.price} € / Monat`;
+    }
+    if (item.type === "job") {
+      meta = `${item.city} • ab ${item.salary} € / Stunde`;
+    }
+    if (item.type === "dating") {
+      meta = `${item.city} • ${item.age} Jahre`;
+    }
+
+    return `
+      <article class="listing-card">
+
+        <button class="fav-btn active"
+          onclick="event.stopPropagation(); toggleFavorite(${item.id}); this.closest('.listing-card').remove()">
+          ❤
+        </button>
+
+        <div onclick="openListing('${item.type}', ${item.id})">
+          <img src="${getListingImages(item)[0]}" class="listing-img">
+          <div class="listing-content">
+            <h3>${item.title}</h3>
+            <p class="listing-meta">${meta}</p>
+            <p class="listing-desc">${item.description}</p>
+          </div>
+        </div>
+
+      </article>
+    `;
+  }).join("");
+}
+
+
 /* =========================
    INIT
 ========================= */
@@ -265,4 +317,9 @@ document.addEventListener("DOMContentLoaded", () => {
   if (page === "listing") {
     renderListingDetail();
   }
+
+  if (page === "favorites") {
+    renderFavorites();
+  }
+
 });

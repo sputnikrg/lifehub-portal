@@ -326,25 +326,52 @@ button:hover { opacity: 0.9; }
   border-color: #000;
 }
 
+/* FAVORITES BUTTON */
 .fav-btn {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  background: white;
-  border: 1px solid #ddd;
+  top: 14px;
+  right: 14px;
+
+  width: 42px;
+  height: 42px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
   border-radius: 50%;
-  width: 36px;
-  height: 36px;
+
+  font-size: 22px;
+  line-height: 1;
+
   cursor: pointer;
-  font-size: 18px;
-  z-index: 5;
+  z-index: 10;
+
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transition: all 0.2s ease;
+}
+
+.fav-btn:hover {
+  transform: scale(1.08);
 }
 
 .fav-btn.active {
   background: #e63946;
-  color: white;
-  border-color: #e63946;
+  color: #fff;
 }
+
+.fav-btn.big {
+  position: static;
+  margin: 16px 0;
+  border-radius: 10px;
+  padding: 10px 16px;
+  width: auto;
+  height: auto;
+  font-size: 16px;
+}
+
 
 .fav-btn.big {
   position: static;
@@ -355,6 +382,13 @@ button:hover { opacity: 0.9; }
   padding: 8px 14px;
 }
 
+.page-listings {
+  display: block;
+}
+
+.listing-grid {
+  display: grid;
+}
 
 
 

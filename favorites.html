@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Favoriten • LifeHub</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="stylesheet" href="assets/css/style.css">
+  <script src="assets/js/script.js" defer></script>
+</head>
+
+<body data-page="favorites">
+
+<header>
+  <div class="logo">
+    <button class="logo-btn" onclick="window.location.href='index.html'">
+      <img src="assets/img/logo.png" alt="LifeHub Logo">
+    </button>
+  </div>
+  <nav>
+    <button class="ad" onclick="window.location.href='post-ad.html'">
+      Anzeige aufgeben
+    </button>
+  </nav>
+</header>
+
+<main class="page-main">
+  <section class="page-hero">
+    <div class="container">
+      <h1>Meine Favoriten</h1>
+      <p>Gespeicherte Anzeigen</p>
+    </div>
+  </section>
+
+  <section class="page-listings">
+    <div class="container">
+      <div id="listing-container" class="listing-grid"></div>
+    </div>
+  </section>
+</main>
+
+</body>
+</html>
