@@ -13,7 +13,11 @@ const defaultListings = [
     city: "Waiblingen",
     price: 850,
     description: "Helle, möblierte Wohnung, Nähe S-Bahn.",
-    image: "assets/img/wohnung.jpg",
+    images: [
+      "assets/img/wohnung.jpg",
+      "assets/img/wohnung.jpg",
+      "assets/img/wohnung.jpg"
+    ],
     createdAt: "2025-01-10"
   },
   {
@@ -54,22 +58,18 @@ const defaultListings = [
 let userListings = [];
 
 function loadUserListings() {
+  const raw = localStorage.getItem(STORAGE_KEY);
+  if (!raw) return;
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return;
     const data = JSON.parse(raw);
     if (Array.isArray(data)) userListings = data;
   } catch (e) {
-    console.error("LocalStorage read error", e);
+    console.error(e);
   }
 }
 
 function saveUserListings() {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(userListings));
-  } catch (e) {
-    console.error("LocalStorage save error", e);
-  }
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(userListings));
 }
 
 /* =========================
@@ -87,11 +87,19 @@ function getAllListings() {
 }
 
 function getListingsByType(type) {
-  return getAllListings().filter(item => item.type === type);
+  return getAllListings().filter(i => i.type === type);
+}
+
+function getListingImages(item) {
+  if (Array.isArray(item.images) && item.images.length) {
+    return item.images;
+  }
+  if (item.image) return [item.image];
+  return [getDefaultImage(item.type)];
 }
 
 /* =========================
-   RENDER
+   RENDER LIST
 ========================= */
 function renderListings(type) {
   renderCustomListings(getListingsByType(type), type);
@@ -101,217 +109,97 @@ function renderCustomListings(items, type) {
   const container = document.getElementById("listing-container");
   if (!container) return;
 
-  if (items.length === 0) {
+  if (!items.length) {
     container.innerHTML = "<p>Keine Einträge gefunden.</p>";
     return;
   }
 
   container.innerHTML = items.map(item => {
-    const imgSrc = item.image || getDefaultImage(type);
-
     let meta = "";
-    if (type === "wohnung") {
-      meta = `${item.city} • ${item.price || "-"} € / Monat`;
-    } else if (type === "job") {
-      meta = `${item.city} • ab ${item.salary || "-"} € / Stunde`;
-    } else if (type === "dating") {
-      meta = `${item.city} • ${item.age || ""} Jahre`;
-    }
+    if (type === "wohnung") meta = `${item.city} • ${item.price} € / Monat`;
+    if (type === "job") meta = `${item.city} • ab ${item.salary} € / Stunde`;
+    if (type === "dating") meta = `${item.city} • ${item.age} Jahre`;
 
     return `
-      <article class="listing-card"
-           onclick="openListing('${type}', ${item.id})">
-    <img src="${imgSrc}" class="listing-img" alt="${item.title}">
-    <div class="listing-content">
-      <h3>${item.title}</h3>
-      <p class="listing-meta">${meta}</p>
-      <p class="listing-desc">${item.description}</p>
-    </div>
-  </article>
-`;
+      <article class="listing-card" onclick="openListing('${type}', ${item.id})">
+        <img src="${getListingImages(item)[0]}" class="listing-img">
+        <div class="listing-content">
+          <h3>${item.title}</h3>
+          <p class="listing-meta">${meta}</p>
+          <p class="listing-desc">${item.description}</p>
+        </div>
+      </article>
+    `;
   }).join("");
 }
 
+/* =========================
+   SEARCH
+========================= */
 function initSearch(type) {
   const form = document.getElementById("searchForm");
   const input = document.getElementById("searchInput");
   if (!form || !input) return;
 
-  form.addEventListener("submit", (e) => {
+  form.addEventListener("submit", e => {
     e.preventDefault();
-
-    const query = input.value.trim().toLowerCase();
-    let items = getListingsByType(type);
-
-    if (query) {
-      items = items.filter(item =>
-        item.title.toLowerCase().includes(query) ||
-        item.description.toLowerCase().includes(query)
-      );
-    }
-
+    const q = input.value.toLowerCase();
+    const items = getListingsByType(type).filter(i =>
+      i.title.toLowerCase().includes(q) ||
+      i.description.toLowerCase().includes(q)
+    );
     renderCustomListings(items, type);
   });
 }
 
-
 /* =========================
-   FILTER: WOHNUNG
+   DETAIL PAGE
 ========================= */
-function initWohnungFilters() {
-  const form = document.getElementById("wohnungFilter");
-  if (!form) return;
-
-  const cityInput = document.getElementById("filterCity");
-  const priceInput = document.getElementById("filterMaxPrice");
-  const resetBtn = document.getElementById("filterReset");
-
-  form.addEventListener("submit", e => {
-    e.preventDefault();
-
-    let items = getListingsByType("wohnung");
-
-    const city = cityInput.value.trim().toLowerCase();
-    const maxPrice = Number(priceInput.value);
-
-    if (city) {
-      items = items.filter(i =>
-        i.city && i.city.toLowerCase().includes(city)
-      );
-    }
-
-    if (!Number.isNaN(maxPrice) && maxPrice > 0) {
-      items = items.filter(i => i.price <= maxPrice);
-    }
-
-    renderCustomListings(items, "wohnung");
-  });
-
-  resetBtn.addEventListener("click", () => {
-    cityInput.value = "";
-    priceInput.value = "";
-    renderListings("wohnung");
-  });
-}
-
-/* =========================
-   FILTER: JOB
-========================= */
-function initJobFilters() {
-  const form = document.getElementById("jobFilter");
-  if (!form) return;
-
-  const cityInput = document.getElementById("jobCity");
-  const salaryInput = document.getElementById("jobMinSalary");
-  const resetBtn = document.getElementById("jobFilterReset");
-
-  form.addEventListener("submit", e => {
-    e.preventDefault();
-
-    let items = getListingsByType("job");
-
-    const city = cityInput.value.trim().toLowerCase();
-    const minSalary = Number(salaryInput.value);
-
-    if (city) {
-      items = items.filter(i =>
-        i.city && i.city.toLowerCase().includes(city)
-      );
-    }
-
-    if (!Number.isNaN(minSalary) && minSalary > 0) {
-      items = items.filter(i => i.salary >= minSalary);
-    }
-
-    renderCustomListings(items, "job");
-  });
-
-  resetBtn.addEventListener("click", () => {
-    cityInput.value = "";
-    salaryInput.value = "";
-    renderListings("job");
-  });
-}
-
-/* =========================
-   POST FORM
-========================= */
-function initPostForm() {
-  const form = document.getElementById("adForm");
-  if (!form) return;
-
-  form.addEventListener("submit", e => {
-    e.preventDefault();
-
-    const type = document.getElementById("type").value;
-    const title = document.getElementById("title").value.trim();
-    const city = document.getElementById("city").value.trim();
-    const description = document.getElementById("desc").value.trim();
-
-    if (!title || !city || !description) {
-      alert("Bitte alle Felder ausfüllen.");
-      return;
-    }
-
-    userListings.push({
-      id: Date.now(),
-      type,
-      title,
-      city,
-      description,
-      price: 0,
-      salary: 0,
-      age: 0,
-      image: getDefaultImage(type),
-      createdAt: new Date().toISOString().slice(0, 10)
-    });
-
-    saveUserListings();
-    alert("Anzeige gespeichert!");
-    window.location.href = `${type}.html`;
-  });
-}
-
 function openListing(type, id) {
   window.location.href = `listing.html?type=${type}&id=${id}`;
 }
 
 function getListingFromUrl() {
-  const params = new URLSearchParams(window.location.search);
-  const id = Number(params.get("id"));
-  const type = params.get("type");
+  const p = new URLSearchParams(window.location.search);
+  const id = Number(p.get("id"));
+  const type = p.get("type");
+  return getAllListings().find(i => i.id === id && i.type === type);
+}
 
-  if (!id || !type) return null;
-
-  return getAllListings().find(
-    item => item.id === id && item.type === type
-  );
+function setGalleryImage(src, el) {
+  document.getElementById("galleryMain").src = src;
+  document.querySelectorAll(".gallery-thumb").forEach(t => t.classList.remove("active"));
+  el.classList.add("active");
 }
 
 function renderListingDetail() {
-  const container = document.getElementById("listing-detail");
-  if (!container) return;
+  const c = document.getElementById("listing-detail");
+  if (!c) return;
 
   const item = getListingFromUrl();
   if (!item) {
-    container.innerHTML = "<p>Anzeige nicht gefunden.</p>";
+    c.innerHTML = "<p>Anzeige nicht gefunden.</p>";
     return;
   }
 
-  const imgSrc = item.image || getDefaultImage(item.type);
+  const images = getListingImages(item);
 
   let meta = "";
-  if (item.type === "wohnung") {
-    meta = `${item.city} • ${item.price || "-"} € / Monat`;
-  } else if (item.type === "job") {
-    meta = `${item.city} • ab ${item.salary || "-"} € / Stunde`;
-  } else if (item.type === "dating") {
-    meta = `${item.city} • ${item.age || ""} Jahre`;
-  }
+  if (item.type === "wohnung") meta = `${item.city} • ${item.price} € / Monat`;
+  if (item.type === "job") meta = `${item.city} • ab ${item.salary} € / Stunde`;
+  if (item.type === "dating") meta = `${item.city} • ${item.age} Jahre`;
 
-  container.innerHTML = `
+  c.innerHTML = `
     <article class="listing-detail">
-      <img src="${imgSrc}" class="listing-detail-img" alt="${item.title}">
+      <div class="gallery">
+        <img src="${images[0]}" id="galleryMain" class="gallery-main">
+        <div class="gallery-thumbs">
+          ${images.map((img, i) => `
+            <img src="${img}" class="gallery-thumb ${i === 0 ? "active" : ""}"
+                 onclick="setGalleryImage('${img}', this)">
+          `).join("")}
+        </div>
+      </div>
       <h1>${item.title}</h1>
       <p class="listing-meta">${meta}</p>
       <p class="listing-desc">${item.description}</p>
@@ -319,26 +207,21 @@ function renderListingDetail() {
   `;
 }
 
-
 /* =========================
    INIT
 ========================= */
 document.addEventListener("DOMContentLoaded", () => {
   loadUserListings();
-
   const page = document.body.dataset.page;
-  if (!page) return;
 
   if (page === "wohnung") {
     renderListings("wohnung");
     initSearch("wohnung");
-    initWohnungFilters();
   }
 
   if (page === "job") {
     renderListings("job");
     initSearch("job");
-    initJobFilters();
   }
 
   if (page === "dating") {
@@ -346,12 +229,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initSearch("dating");
   }
 
-  if (page === "post") {
-    initPostForm();
-  }
-
   if (page === "listing") {
-  renderListingDetail();
-}
-
+    renderListingDetail();
+  }
 });
