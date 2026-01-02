@@ -2,6 +2,29 @@
 
 const STORAGE_KEY = "lifehub_user_ads_v1";
 
+const FAVORITES_KEY = "lifehub_favorites_v1";
+
+function getFavorites() {
+  const raw = localStorage.getItem(FAVORITES_KEY);
+  return raw ? JSON.parse(raw) : [];
+}
+
+function isFavorite(id) {
+  return getFavorites().includes(id);
+}
+
+function toggleFavorite(id) {
+  let favs = getFavorites();
+
+  if (favs.includes(id)) {
+    favs = favs.filter(f => f !== id);
+  } else {
+    favs.push(id);
+  }
+
+  localStorage.setItem(FAVORITES_KEY, JSON.stringify(favs));
+}
+
 /* =========================
    БАЗОВЫЕ ОБЪЯВЛЕНИЯ
 ========================= */
@@ -121,15 +144,25 @@ function renderCustomListings(items, type) {
     if (type === "dating") meta = `${item.city} • ${item.age} Jahre`;
 
     return `
-      <article class="listing-card" onclick="openListing('${type}', ${item.id})">
-        <img src="${getListingImages(item)[0]}" class="listing-img">
-        <div class="listing-content">
-          <h3>${item.title}</h3>
-          <p class="listing-meta">${meta}</p>
-          <p class="listing-desc">${item.description}</p>
-        </div>
-      </article>
-    `;
+  <article class="listing-card">
+
+    <button class="fav-btn ${isFavorite(item.id) ? "active" : ""}"
+      onclick="event.stopPropagation(); toggleFavorite(${item.id}); this.classList.toggle('active')">
+      ❤
+    </button>
+
+    <div onclick="openListing('${type}', ${item.id})">
+      <img src="${getListingImages(item)[0]}" class="listing-img">
+      <div class="listing-content">
+        <h3>${item.title}</h3>
+        <p class="listing-meta">${meta}</p>
+        <p class="listing-desc">${item.description}</p>
+      </div>
+    </div>
+
+  </article>
+`;
+
   }).join("");
 }
 

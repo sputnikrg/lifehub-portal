@@ -325,4 +325,33 @@ button:hover { opacity: 0.9; }
   border-color: #000;
 }
 
+.fav-btn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.fav-btn.active {
+  background: #e63946;
+  color: white;
+  border-color: #e63946;
+}
+
+.fav-btn.big {
+  position: static;
+  margin: 12px 0;
+  width: auto;
+  height: auto;
+  border-radius: 8px;
+  padding: 8px 14px;
+}
+
+
 
