@@ -38,6 +38,21 @@
     <section class="page-listings">
       <div class="container">
         <h2>Aktuelle Jobs</h2>
+        <form id="jobFilter" class="filter-box">
+          <div class="filter-field">
+            <label for="jobCity">Stadt</label>
+            <input id="jobCity" type="text" placeholder="z.B. Stuttgart">
+          </div>
+
+          <div class="filter-field">
+            <label for="jobMinSalary">Min. €/Stunde</label>
+            <input id="jobMinSalary" type="number" min="0" placeholder="z.B. 14">
+          </div>
+
+          <button type="submit" class="google">Filtern</button>
+          <button type="button" class="ad" id="jobFilterReset">Zurücksetzen</button>
+        </form>
+
         <div id="listing-container" class="listing-grid"></div>
       </div>
     </section>

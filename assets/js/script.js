@@ -211,6 +211,37 @@ function initWohnungFilters() {
     renderListings("wohnung", options);
   }
 
+  function renderCustomListings(items, type) {
+    const container = document.getElementById("listing-container");
+    if (!container) return;
+
+    if (items.length === 0) {
+      container.innerHTML = "<p>Keine Einträge gefunden.</p>";
+      return;
+    }
+
+    container.innerHTML = items.map((item) => {
+      const imgSrc = item.image || getDefaultImage(type);
+
+      let metaLine = "";
+      if (type === "job") {
+        metaLine = `${item.city} • ab ${item.salary || "-"} € / Stunde`;
+      }
+
+      return `
+      <article class="listing-card">
+        <img src="${imgSrc}" alt="${item.title}" class="listing-img">
+        <div class="listing-content">
+          <h3>${item.title}</h3>
+          <p class="listing-meta">${metaLine}</p>
+          <p class="listing-desc">${item.description}</p>
+        </div>
+      </article>
+    `;
+    }).join("");
+  }
+
+
   form.addEventListener("submit", (e) => {
     e.preventDefault();
     applyFilters();
@@ -225,6 +256,52 @@ function initWohnungFilters() {
   }
 }
 
+// Инициализация фильтра вакансий
+function initJobFilters() {
+  const form = document.getElementById("jobFilter");
+  if (!form) return;
+
+  const cityInput = document.getElementById("jobCity");
+  const salaryInput = document.getElementById("jobMinSalary");
+  const resetBtn = document.getElementById("jobFilterReset");
+
+  function applyFilters() {
+    const city = cityInput.value.trim().toLowerCase();
+    const minSalary = Number(salaryInput.value);
+
+    let items = getListingsByType("job");
+
+    if (city) {
+      items = items.filter(
+        (item) =>
+          item.city &&
+          item.city.toLowerCase().includes(city)
+      );
+    }
+
+    if (!Number.isNaN(minSalary) && minSalary > 0) {
+      items = items.filter(
+        (item) =>
+          typeof item.salary === "number" &&
+          item.salary >= minSalary
+      );
+    }
+
+    renderCustomListings(items, "job");
+  }
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    applyFilters();
+  });
+
+  resetBtn.addEventListener("click", () => {
+    cityInput.value = "";
+    salaryInput.value = "";
+    renderListings("job");
+  });
+}
+
 // Главная инициализация
 document.addEventListener("DOMContentLoaded", () => {
   loadUserListings();
@@ -237,6 +314,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initWohnungFilters();
   } else if (page === "job") {
     renderListings("job");
+    initJobFilters();
   } else if (page === "dating") {
     renderListings("dating");
   } else if (page === "post") {
