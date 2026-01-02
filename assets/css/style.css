@@ -280,3 +280,17 @@ button:hover { opacity: 0.9; }
   font-size: 1rem;
 }
 
+.listing-detail img {
+  width: 100%;
+  max-height: 420px;
+  object-fit: cover;
+  border-radius: 16px;
+  margin-bottom: 16px;
+}
+
+.listing-detail h1 {
+  font-size: 1.8rem;
+  margin-bottom: 8px;
+}
+
+

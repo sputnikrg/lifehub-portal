@@ -119,15 +119,16 @@ function renderCustomListings(items, type) {
     }
 
     return `
-      <article class="listing-card">
-        <img src="${imgSrc}" class="listing-img" alt="${item.title}">
-        <div class="listing-content">
-          <h3>${item.title}</h3>
-          <p class="listing-meta">${meta}</p>
-          <p class="listing-desc">${item.description}</p>
-        </div>
-      </article>
-    `;
+      <article class="listing-card"
+           onclick="openListing('${type}', ${item.id})">
+    <img src="${imgSrc}" class="listing-img" alt="${item.title}">
+    <div class="listing-content">
+      <h3>${item.title}</h3>
+      <p class="listing-meta">${meta}</p>
+      <p class="listing-desc">${item.description}</p>
+    </div>
+  </article>
+`;
   }).join("");
 }
 
@@ -271,6 +272,54 @@ function initPostForm() {
   });
 }
 
+function openListing(type, id) {
+  window.location.href = `listing.html?type=${type}&id=${id}`;
+}
+
+function getListingFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const id = Number(params.get("id"));
+  const type = params.get("type");
+
+  if (!id || !type) return null;
+
+  return getAllListings().find(
+    item => item.id === id && item.type === type
+  );
+}
+
+function renderListingDetail() {
+  const container = document.getElementById("listing-detail");
+  if (!container) return;
+
+  const item = getListingFromUrl();
+  if (!item) {
+    container.innerHTML = "<p>Anzeige nicht gefunden.</p>";
+    return;
+  }
+
+  const imgSrc = item.image || getDefaultImage(item.type);
+
+  let meta = "";
+  if (item.type === "wohnung") {
+    meta = `${item.city} • ${item.price || "-"} € / Monat`;
+  } else if (item.type === "job") {
+    meta = `${item.city} • ab ${item.salary || "-"} € / Stunde`;
+  } else if (item.type === "dating") {
+    meta = `${item.city} • ${item.age || ""} Jahre`;
+  }
+
+  container.innerHTML = `
+    <article class="listing-detail">
+      <img src="${imgSrc}" class="listing-detail-img" alt="${item.title}">
+      <h1>${item.title}</h1>
+      <p class="listing-meta">${meta}</p>
+      <p class="listing-desc">${item.description}</p>
+    </article>
+  `;
+}
+
+
 /* =========================
    INIT
 ========================= */
@@ -280,24 +329,29 @@ document.addEventListener("DOMContentLoaded", () => {
   const page = document.body.dataset.page;
   if (!page) return;
 
- if (page === "wohnung") {
-  renderListings("wohnung");
-  initSearch("wohnung");
-  initWohnungFilters();
-}
+  if (page === "wohnung") {
+    renderListings("wohnung");
+    initSearch("wohnung");
+    initWohnungFilters();
+  }
 
   if (page === "job") {
-  renderListings("job");
-  initSearch("job");
-  initJobFilters();
-}
+    renderListings("job");
+    initSearch("job");
+    initJobFilters();
+  }
 
-if (page === "dating") {
-  renderListings("dating");
-  initSearch("dating");
-}
+  if (page === "dating") {
+    renderListings("dating");
+    initSearch("dating");
+  }
 
   if (page === "post") {
     initPostForm();
   }
+
+  if (page === "listing") {
+  renderListingDetail();
+}
+
 });
