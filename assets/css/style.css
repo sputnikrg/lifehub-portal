@@ -268,3 +268,15 @@ button:hover { opacity: 0.9; }
   border: 1px solid #ccc;
 }
 
+.search-box {
+  margin: 12px 0;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+

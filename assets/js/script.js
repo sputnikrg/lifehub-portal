@@ -131,6 +131,29 @@ function renderCustomListings(items, type) {
   }).join("");
 }
 
+function initSearch(type) {
+  const form = document.getElementById("searchForm");
+  const input = document.getElementById("searchInput");
+  if (!form || !input) return;
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const query = input.value.trim().toLowerCase();
+    let items = getListingsByType(type);
+
+    if (query) {
+      items = items.filter(item =>
+        item.title.toLowerCase().includes(query) ||
+        item.description.toLowerCase().includes(query)
+      );
+    }
+
+    renderCustomListings(items, type);
+  });
+}
+
+
 /* =========================
    FILTER: WOHNUNG
 ========================= */
@@ -257,19 +280,22 @@ document.addEventListener("DOMContentLoaded", () => {
   const page = document.body.dataset.page;
   if (!page) return;
 
-  if (page === "wohnung") {
-    renderListings("wohnung");
-    initWohnungFilters();
-  }
+ if (page === "wohnung") {
+  renderListings("wohnung");
+  initSearch("wohnung");
+  initWohnungFilters();
+}
 
   if (page === "job") {
-    renderListings("job");
-    initJobFilters();
-  }
+  renderListings("job");
+  initSearch("job");
+  initJobFilters();
+}
 
-  if (page === "dating") {
-    renderListings("dating");
-  }
+if (page === "dating") {
+  renderListings("dating");
+  initSearch("dating");
+}
 
   if (page === "post") {
     initPostForm();
