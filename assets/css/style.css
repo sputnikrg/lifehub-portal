@@ -18,6 +18,19 @@ header {
 .logo img {
   height: 50px;
 }
+
+.logo-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.logo-btn img {
+  display: block;
+}
+
 nav {
   display: flex;
   align-items: center;
@@ -174,6 +187,12 @@ button:hover { opacity: 0.9; }
   position: relative;
   box-shadow: 0 6px 20px rgba(0,0,0,0.08);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.listing-card.removing {
+  opacity: 0;
+  transform: scale(0.96);
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
 .listing-card:hover {
@@ -359,6 +378,28 @@ button:hover { opacity: 0.9; }
   transition: transform 0.15s ease, background 0.15s ease;
 }
 
+.fav-btn::after {
+  content: 'Entfernen';
+  position: absolute;
+  top: 46px;
+  right: 50%;
+  transform: translateX(50%);
+  background: #000;
+  color: #fff;
+  font-size: 0.75rem;
+  padding: 4px 6px;
+  border-radius: 4px;
+  opacity: 0;
+  pointer-events: none;
+  white-space: nowrap;
+  transition: opacity 0.15s ease;
+}
+
+.fav-btn:hover::after {
+  opacity: 1;
+}
+
+
 .fav-btn:hover {
   transform: scale(1.08);
 }
@@ -395,6 +436,37 @@ button:hover { opacity: 0.9; }
 .listing-grid {
   display: grid;
 }
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #666;
+}
+
+.empty-state h2 {
+  font-size: 1.6rem;
+  margin-bottom: 12px;
+}
+
+.empty-state p {
+  font-size: 1rem;
+  margin-bottom: 20px;
+}
+
+.empty-state a {
+  display: inline-block;
+  padding: 10px 18px;
+  background: #1976d2;
+  color: #fff;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.empty-state a:hover {
+  opacity: 0.9;
+}
+
 
 @media (max-width: 480px) {
   .listing-img {

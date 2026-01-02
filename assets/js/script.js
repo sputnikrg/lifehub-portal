@@ -1,14 +1,16 @@
 console.log("SCRIPT LOADED");
 
-// assets/js/script.js
-
+// =========================
+// STORAGE KEYS
+// =========================
 const STORAGE_KEY = "lifehub_user_ads_v1";
-
 const FAVORITES_KEY = "lifehub_favorites_v1";
 
+// =========================
+// FAVORITES HELPERS
+// =========================
 function getFavorites() {
-  const raw = localStorage.getItem(FAVORITES_KEY);
-  return raw ? JSON.parse(raw) : [];
+  return JSON.parse(localStorage.getItem(FAVORITES_KEY) || "[]");
 }
 
 function isFavorite(id) {
@@ -27,9 +29,23 @@ function toggleFavorite(id) {
   localStorage.setItem(FAVORITES_KEY, JSON.stringify(favs));
 }
 
-/* =========================
-   БАЗОВЫЕ ОБЪЯВЛЕНИЯ
-========================= */
+// ✅ ВАЖНО: отдельная функция, БЕЗ inline-логики
+function removeFavoriteWithAnimation(btn, id) {
+  toggleFavorite(id);
+
+  const card = btn.closest(".listing-card");
+  if (!card) return;
+
+  card.classList.add("removing");
+
+  setTimeout(() => {
+    card.remove();
+  }, 200);
+}
+
+// =========================
+// BASE LISTINGS
+// =========================
 const defaultListings = [
   {
     id: 1,
@@ -42,8 +58,7 @@ const defaultListings = [
       "assets/img/wohnung.jpg",
       "assets/img/wohnung.jpg",
       "assets/img/wohnung.jpg"
-    ],
-    createdAt: "2025-01-10"
+    ]
   },
   {
     id: 2,
@@ -52,8 +67,7 @@ const defaultListings = [
     city: "Weinstadt",
     price: 620,
     description: "Ideal für Singles, moderne Küche.",
-    image: "assets/img/wohnung.jpg",
-    createdAt: "2025-01-12"
+    image: "assets/img/wohnung.jpg"
   },
   {
     id: 3,
@@ -62,8 +76,7 @@ const defaultListings = [
     city: "Weinstadt",
     salary: 14,
     description: "Flexible Zeiten, freundliches Team.",
-    image: "assets/img/job.jpg",
-    createdAt: "2025-01-15"
+    image: "assets/img/job.jpg"
   },
   {
     id: 4,
@@ -72,34 +85,13 @@ const defaultListings = [
     city: "Stuttgart",
     age: 35,
     description: "Neu in Deutschland, offen für Kontakte.",
-    image: "assets/img/dating.jpg",
-    createdAt: "2025-01-16"
+    image: "assets/img/dating.jpg"
   }
 ];
 
-/* =========================
-   LOCAL STORAGE
-========================= */
-let userListings = [];
-
-function loadUserListings() {
-  const raw = localStorage.getItem(STORAGE_KEY);
-  if (!raw) return;
-  try {
-    const data = JSON.parse(raw);
-    if (Array.isArray(data)) userListings = data;
-  } catch (e) {
-    console.error(e);
-  }
-}
-
-function saveUserListings() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(userListings));
-}
-
-/* =========================
-   HELPERS
-========================= */
+// =========================
+// HELPERS
+// =========================
 function getDefaultImage(type) {
   if (type === "wohnung") return "assets/img/wohnung.jpg";
   if (type === "job") return "assets/img/job.jpg";
@@ -108,28 +100,18 @@ function getDefaultImage(type) {
 }
 
 function getAllListings() {
-  return [...defaultListings, ...userListings];
-}
-
-function getListingsByType(type) {
-  return getAllListings().filter(i => i.type === type);
+  return defaultListings;
 }
 
 function getListingImages(item) {
-  if (Array.isArray(item.images) && item.images.length) {
-    return item.images;
-  }
+  if (Array.isArray(item.images) && item.images.length) return item.images;
   if (item.image) return [item.image];
   return [getDefaultImage(item.type)];
 }
 
-/* =========================
-   RENDER LIST
-========================= */
-function renderListings(type) {
-  renderCustomListings(getListingsByType(type), type);
-}
-
+// =========================
+// RENDER LISTINGS
+// =========================
 function renderCustomListings(items, type) {
   const container = document.getElementById("listing-container");
   if (!container) return;
@@ -146,102 +128,35 @@ function renderCustomListings(items, type) {
     if (type === "dating") meta = `${item.city} • ${item.age} Jahre`;
 
     return `
-  <article class="listing-card">
+      <article class="listing-card">
+        <button class="fav-btn ${isFavorite(item.id) ? "active" : ""}"
+          onclick="event.stopPropagation(); toggleFavorite(${item.id}); this.classList.toggle('active')">
+          ❤
+        </button>
 
-    <button class="fav-btn ${isFavorite(item.id) ? "active" : ""}"
-      onclick="event.stopPropagation(); toggleFavorite(${item.id}); this.classList.toggle('active')">
-      ❤
-    </button>
-
-    <div onclick="openListing('${type}', ${item.id})">
-      <img src="${getListingImages(item)[0]}" class="listing-img">
-      <div class="listing-content">
-        <h3>${item.title}</h3>
-        <p class="listing-meta">${meta}</p>
-        <p class="listing-desc">${item.description}</p>
-      </div>
-    </div>
-
-  </article>
-`;
-
+        <div onclick="openListing('${type}', ${item.id})">
+          <img src="${getListingImages(item)[0]}" class="listing-img">
+          <div class="listing-content">
+            <h3>${item.title}</h3>
+            <p class="listing-meta">${meta}</p>
+            <p class="listing-desc">${item.description}</p>
+          </div>
+        </div>
+      </article>
+    `;
   }).join("");
 }
 
-/* =========================
-   SEARCH
-========================= */
-function initSearch(type) {
-  const form = document.getElementById("searchForm");
-  const input = document.getElementById("searchInput");
-  if (!form || !input) return;
-
-  form.addEventListener("submit", e => {
-    e.preventDefault();
-    const q = input.value.toLowerCase();
-    const items = getListingsByType(type).filter(i =>
-      i.title.toLowerCase().includes(q) ||
-      i.description.toLowerCase().includes(q)
-    );
-    renderCustomListings(items, type);
-  });
+function renderListings(type) {
+  renderCustomListings(
+    getAllListings().filter(i => i.type === type),
+    type
+  );
 }
 
-/* =========================
-   DETAIL PAGE
-========================= */
-function openListing(type, id) {
-  window.location.href = `listing.html?type=${type}&id=${id}`;
-}
-
-function getListingFromUrl() {
-  const p = new URLSearchParams(window.location.search);
-  const id = Number(p.get("id"));
-  const type = p.get("type");
-  return getAllListings().find(i => i.id === id && i.type === type);
-}
-
-function setGalleryImage(src, el) {
-  document.getElementById("galleryMain").src = src;
-  document.querySelectorAll(".gallery-thumb").forEach(t => t.classList.remove("active"));
-  el.classList.add("active");
-}
-
-function renderListingDetail() {
-  const c = document.getElementById("listing-detail");
-  if (!c) return;
-
-  const item = getListingFromUrl();
-  if (!item) {
-    c.innerHTML = "<p>Anzeige nicht gefunden.</p>";
-    return;
-  }
-
-  const images = getListingImages(item);
-
-  let meta = "";
-  if (item.type === "wohnung") meta = `${item.city} • ${item.price} € / Monat`;
-  if (item.type === "job") meta = `${item.city} • ab ${item.salary} € / Stunde`;
-  if (item.type === "dating") meta = `${item.city} • ${item.age} Jahre`;
-
-  c.innerHTML = `
-    <article class="listing-detail">
-      <div class="gallery">
-        <img src="${images[0]}" id="galleryMain" class="gallery-main">
-        <div class="gallery-thumbs">
-          ${images.map((img, i) => `
-            <img src="${img}" class="gallery-thumb ${i === 0 ? "active" : ""}"
-                 onclick="setGalleryImage('${img}', this)">
-          `).join("")}
-        </div>
-      </div>
-      <h1>${item.title}</h1>
-      <p class="listing-meta">${meta}</p>
-      <p class="listing-desc">${item.description}</p>
-    </article>
-  `;
-}
-
+// =========================
+// FAVORITES PAGE
+// =========================
 function renderFavorites() {
   const container = document.getElementById("listing-container");
   if (!container) return;
@@ -249,31 +164,28 @@ function renderFavorites() {
   const favIds = getFavorites();
 
   if (!favIds.length) {
-    container.innerHTML = "<p>Keine Favoriten gespeichert.</p>";
+    container.innerHTML = `
+      <div class="empty-state">
+        <h2>Keine Favoriten</h2>
+        <p>Du hast noch keine Anzeigen gespeichert.</p>
+        <a href="wohnung.html">Wohnungen ansehen</a>
+      </div>
+    `;
     return;
   }
 
-  const items = getAllListings().filter(item =>
-    favIds.includes(item.id)
-  );
+  const items = getAllListings().filter(i => favIds.includes(i.id));
 
   container.innerHTML = items.map(item => {
     let meta = "";
-    if (item.type === "wohnung") {
-      meta = `${item.city} • ${item.price} € / Monat`;
-    }
-    if (item.type === "job") {
-      meta = `${item.city} • ab ${item.salary} € / Stunde`;
-    }
-    if (item.type === "dating") {
-      meta = `${item.city} • ${item.age} Jahre`;
-    }
+    if (item.type === "wohnung") meta = `${item.city} • ${item.price} € / Monat`;
+    if (item.type === "job") meta = `${item.city} • ab ${item.salary} € / Stunde`;
+    if (item.type === "dating") meta = `${item.city} • ${item.age} Jahre`;
 
     return `
       <article class="listing-card">
-
         <button class="fav-btn active"
-          onclick="event.stopPropagation(); toggleFavorite(${item.id}); this.closest('.listing-card').remove()">
+          onclick="event.stopPropagation(); removeFavoriteWithAnimation(this, ${item.id})">
           ❤
         </button>
 
@@ -285,41 +197,26 @@ function renderFavorites() {
             <p class="listing-desc">${item.description}</p>
           </div>
         </div>
-
       </article>
     `;
   }).join("");
 }
 
+// =========================
+// NAV / DETAIL
+// =========================
+function openListing(type, id) {
+  window.location.href = `listing.html?type=${type}&id=${id}`;
+}
 
-/* =========================
-   INIT
-========================= */
+// =========================
+// INIT
+// =========================
 document.addEventListener("DOMContentLoaded", () => {
-  loadUserListings();
   const page = document.body.dataset.page;
 
-  if (page === "wohnung") {
-    renderListings("wohnung");
-    initSearch("wohnung");
-  }
-
-  if (page === "job") {
-    renderListings("job");
-    initSearch("job");
-  }
-
-  if (page === "dating") {
-    renderListings("dating");
-    initSearch("dating");
-  }
-
-  if (page === "listing") {
-    renderListingDetail();
-  }
-
-  if (page === "favorites") {
-    renderFavorites();
-  }
-
+  if (page === "wohnung") renderListings("wohnung");
+  if (page === "job") renderListings("job");
+  if (page === "dating") renderListings("dating");
+  if (page === "favorites") renderFavorites();
 });
