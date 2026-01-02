@@ -179,6 +179,7 @@ button:hover { opacity: 0.9; }
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  position: relative;
 }
 
 .listing-img {
@@ -336,6 +337,7 @@ button:hover { opacity: 0.9; }
   height: 36px;
   cursor: pointer;
   font-size: 18px;
+  z-index: 5;
 }
 
 .fav-btn.active {
@@ -352,6 +354,7 @@ button:hover { opacity: 0.9; }
   border-radius: 8px;
   padding: 8px 14px;
 }
+
 
 
 
