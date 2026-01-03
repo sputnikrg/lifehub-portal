@@ -15,6 +15,28 @@ header {
   position: relative;
   z-index: 10;
 }
+
+.main-nav {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.fav-link {
+  background: none;
+  border: 2px solid #e63946;
+  color: #e63946;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.fav-link:hover {
+  background: #e63946;
+  color: #fff;
+}
+
 .logo img {
   height: 50px;
 }
