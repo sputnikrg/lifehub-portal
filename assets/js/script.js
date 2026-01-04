@@ -209,14 +209,60 @@ function openListing(type, id) {
   window.location.href = `listing.html?type=${type}&id=${id}`;
 }
 
+function markActiveFilters(form) {
+  if (!form) return;
+
+  let hasActive = false;
+
+  form.querySelectorAll("input").forEach(input => {
+    if (input.value.trim() !== "") {
+      input.classList.add("active");
+      hasActive = true;
+    } else {
+      input.classList.remove("active");
+    }
+  });
+
+  form.classList.toggle("active", hasActive);
+}
+
 // =========================
 // INIT
 // =========================
 document.addEventListener("DOMContentLoaded", () => {
   const page = document.body.dataset.page;
 
-  if (page === "wohnung") renderListings("wohnung");
-  if (page === "job") renderListings("job");
+  if (page === "wohnung") {
+    renderListings("wohnung");
+    initSearch("wohnung");
+
+    const wohnungFilter = document.getElementById("wohnungFilter");
+    if (wohnungFilter) {
+      wohnungFilter.addEventListener("input", () => {
+        markActiveFilters(wohnungFilter);
+      });
+
+      wohnungFilter.addEventListener("reset", () => {
+        setTimeout(() => markActiveFilters(wohnungFilter));
+      });
+    }
+  }
+  if (page === "job") {
+    renderListings("job");
+    initSearch("job");
+
+    const jobFilter = document.getElementById("jobFilter");
+    if (jobFilter) {
+      jobFilter.addEventListener("input", () => {
+        markActiveFilters(jobFilter);
+      });
+
+      jobFilter.addEventListener("reset", () => {
+        setTimeout(() => markActiveFilters(jobFilter));
+      });
+    }
+  }
+
   if (page === "dating") renderListings("dating");
   if (page === "favorites") renderFavorites();
 });

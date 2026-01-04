@@ -58,6 +58,31 @@ nav {
   align-items: center;
   gap: 20px;
 }
+
+/* =========================
+   NAV ACTIVE STATE
+========================= */
+
+[data-nav] {
+  position: relative;
+}
+
+body[data-page="wohnung"] [data-nav="wohnung"],
+body[data-page="job"] [data-nav="job"],
+body[data-page="dating"] [data-nav="dating"],
+body[data-page="favorites"] [data-nav="favorites"],
+body[data-page="post"] [data-nav="post"] {
+  background: #1976d2;
+  color: #fff;
+  border-color: #1976d2;
+}
+
+body[data-page="favorites"] .fav-link {
+  background: #e63946;
+  color: #fff;
+  border-color: #e63946;
+}
+
 .lang { color: #888; }
 button {
   border: none;
@@ -316,6 +341,20 @@ button:hover { opacity: 0.9; }
   border: 1px solid #ccc;
 }
 
+/* =========================
+   FILTERS UX
+========================= */
+
+.filter-box.active {
+  border-left: 4px solid #1976d2;
+  padding-left: 12px;
+}
+
+.filter-field input.active {
+  border-color: #1976d2;
+  background: #f0f6ff;
+}
+
 .search-box {
   margin: 12px 0;
 }
@@ -505,5 +544,44 @@ button:hover { opacity: 0.9; }
     font-size: 18px;
   }
 }
+
+/* =========================
+   MOBILE HEADER
+========================= */
+@media (max-width: 768px) {
+  header {
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 16px 20px;
+  }
+
+  .logo {
+    flex: 1 1 auto;
+  }
+
+  .main-nav {
+    flex: 1 1 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: flex-start;
+  }
+
+  .lang {
+    display: none;
+  }
+
+  .google,
+  .ad,
+  .fav-link {
+    padding: 10px 14px;
+    font-size: 0.95rem;
+  }
+
+  .fav-link {
+    align-self: flex-start;
+  }
+}
+
 
 
