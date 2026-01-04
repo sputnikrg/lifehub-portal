@@ -43,6 +43,20 @@ function removeFavoriteWithAnimation(btn, id) {
   }, 200);
 }
 
+function handleOpenListing(el) {
+  const type = el.dataset.type;
+  const id = el.dataset.id;
+
+  openListing(type, id);
+}
+
+function handleToggleFavorite(btn) {
+  const id = Number(btn.dataset.id);
+
+  toggleFavorite(id);
+  btn.classList.toggle("active");
+}
+
 // =========================
 // BASE LISTINGS
 // =========================
@@ -109,6 +123,43 @@ function getListingImages(item) {
   return [getDefaultImage(item.type)];
 }
 
+function ListingCard(item, options = {}) {
+  const { showRemove = false } = options;
+
+  let meta = "";
+  if (item.type === "wohnung") meta = `${item.city} • ${item.price} € / Monat`;
+  if (item.type === "job") meta = `${item.city} • ab ${item.salary} € / Stunde`;
+  if (item.type === "dating") meta = `${item.city} • ${item.age} Jahre`;
+
+  return `
+    <article class="listing-card">
+
+      <div
+        class="listing-click-area"
+        data-action="open-listing"
+        data-type="${item.type}"
+        data-id="${item.id}"
+      >
+        <img src="${getListingImages(item)[0]}" class="listing-img">
+        <div class="listing-content">
+          <h3>${item.title}</h3>
+          <p class="listing-meta">${meta}</p>
+          <p class="listing-desc">${item.description}</p>
+        </div>
+      </div>
+
+      <button
+        class="fav-btn ${isFavorite(item.id) ? "active" : ""}"
+        data-action="toggle-favorite"
+        data-id="${item.id}"
+      >
+        ❤
+      </button>
+
+    </article>
+  `;
+}
+
 // =========================
 // RENDER LISTINGS
 // =========================
@@ -122,33 +173,10 @@ function renderCustomListings(items, type) {
     return;
   }
 
-  container.innerHTML = items.map(item => {
-    let meta = "";
-    if (type === "wohnung") meta = `${item.city} • ${item.price} € / Monat`;
-    if (type === "job") meta = `${item.city} • ab ${item.salary} € / Stunde`;
-    if (type === "dating") meta = `${item.city} • ${item.age} Jahre`;
+  container.innerHTML = items
+    .map(item => ListingCard(item))
+    .join("");
 
-    return `
-      <article class="listing-card">
-
-        <div class="listing-click-area"
-             onclick="openListing('${type}', ${item.id})">
-          <img src="${getListingImages(item)[0]}" class="listing-img">
-          <div class="listing-content">
-            <h3>${item.title}</h3>
-            <p class="listing-meta">${meta}</p>
-            <p class="listing-desc">${item.description}</p>
-          </div>
-        </div>
-
-        <button class="fav-btn ${isFavorite(item.id) ? "active" : ""}"
-          onclick="event.stopPropagation(); toggleFavorite(${item.id}); this.classList.toggle('active')">
-          ❤
-        </button>
-
-      </article>
-    `;
-  }).join("");
 }
 
 function renderListings(type) {
@@ -211,6 +239,53 @@ function openListing(type, id) {
   window.location.href = `listing.html?type=${type}&id=${id}`;
 }
 
+function renderListingDetail() {
+  const container = document.getElementById("listing-detail");
+  if (!container) return;
+
+  const params = new URLSearchParams(window.location.search);
+  const type = params.get("type");
+  const id = Number(params.get("id"));
+
+  if (!type || !id) {
+    container.innerHTML = "<p>Anzeige nicht gefunden.</p>";
+    return;
+  }
+
+  const item = getAllListings().find(
+    listing => listing.type === type && listing.id === id
+  );
+
+  if (!item) {
+    container.innerHTML = "<p>Anzeige nicht gefunden.</p>";
+    return;
+  }
+
+  let meta = "";
+  if (type === "wohnung") meta = `${item.city} • ${item.price} € / Monat`;
+  if (type === "job") meta = `${item.city} • ab ${item.salary} € / Stunde`;
+  if (type === "dating") meta = `${item.city} • ${item.age} Jahre`;
+
+  container.innerHTML = `
+    <article class="listing-detail">
+      <img src="${getListingImages(item)[0]}" alt="">
+      <h1>${item.title}</h1>
+      <p class="listing-meta">${meta}</p>
+      <p class="listing-desc">${item.description}</p>
+
+      <button
+        class="fav-btn big ${isFavorite(item.id) ? "active" : ""}"
+        data-action="toggle-favorite"
+        data-type="${item.type}"
+        data-id="${item.id}"
+      >
+        ❤ Zu Favoriten
+      </button>
+
+    </article>
+  `;
+}
+
 function markActiveFilters(form) {
   if (!form) return;
 
@@ -267,4 +342,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (page === "dating") renderListings("dating");
   if (page === "favorites") renderFavorites();
+  if (page === "listing") renderListingDetail();
 });
+
+document.addEventListener("click", function (event) {
+  const el = event.target.closest("[data-action]");
+  if (!el) return;
+
+  const action = el.dataset.action;
+
+  if (action === "toggle-favorite") {
+    handleToggleFavorite(el);
+  }
+
+  if (action === "open-listing") {
+    handleOpenListing(el);
+  }
+
+});
+
