@@ -113,6 +113,7 @@ function getListingImages(item) {
 // RENDER LISTINGS
 // =========================
 function renderCustomListings(items, type) {
+
   const container = document.getElementById("listing-container");
   if (!container) return;
 
@@ -129,12 +130,9 @@ function renderCustomListings(items, type) {
 
     return `
       <article class="listing-card">
-        <button class="fav-btn ${isFavorite(item.id) ? "active" : ""}"
-          onclick="event.stopPropagation(); toggleFavorite(${item.id}); this.classList.toggle('active')">
-          ❤
-        </button>
 
-        <div onclick="openListing('${type}', ${item.id})">
+        <div class="listing-click-area"
+             onclick="openListing('${type}', ${item.id})">
           <img src="${getListingImages(item)[0]}" class="listing-img">
           <div class="listing-content">
             <h3>${item.title}</h3>
@@ -142,16 +140,20 @@ function renderCustomListings(items, type) {
             <p class="listing-desc">${item.description}</p>
           </div>
         </div>
+
+        <button class="fav-btn ${isFavorite(item.id) ? "active" : ""}"
+          onclick="event.stopPropagation(); toggleFavorite(${item.id}); this.classList.toggle('active')">
+          ❤
+        </button>
+
       </article>
     `;
   }).join("");
 }
 
 function renderListings(type) {
-  renderCustomListings(
-    getAllListings().filter(i => i.type === type),
-    type
-  );
+  const items = getAllListings().filter(item => item.type === type);
+  renderCustomListings(items, type);
 }
 
 // =========================

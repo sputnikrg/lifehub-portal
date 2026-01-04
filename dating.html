@@ -3,14 +3,14 @@
 
 <head>
   <meta charset="UTF-8" />
-  <title>LifeHub • Job</title>
+  <title>LifeHub • Dating</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <link rel="stylesheet" href="assets/css/style.css">
   <script src="assets/js/script.js" defer></script>
 </head>
 
-<!-- ВАЖНО! data-page="wohnung" -->
+<!-- ВАЖНО! data-page="dating" -->
 
 <body data-page="dating">
 
@@ -23,8 +23,13 @@
     <nav class="main-nav">
       <span class="lang">Deutsch | Русский</span>
       <button class="google">Mit Google anmelden</button>
-      <button class="ad" data-nav="dating" onclick="window.location.href='dating.html'">Anzeige aufgeben</button>
+      <button class="ad" data-nav="post" onclick="window.location.href='post-ad.html'">Anzeige aufgeben</button>
     </nav>
+    <button class="fav-link"
+        onclick="window.location.href='favorites.html'">
+  ❤ Favoriten
+</button>
+
   </header>
 
   <main class="page-main">
